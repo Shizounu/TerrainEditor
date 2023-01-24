@@ -44,6 +44,7 @@ public class PlanetGenerator : MonoBehaviour
                     Mesh newMesh = new();
                     newMesh.name = $"TerrainFace_{sideIndex}|{planeIndex}";
                     terrainFilters[sideIndex, planeIndex].sharedMesh = newMesh;
+                    newFace.AddComponent<MeshCollider>().sharedMesh = newMesh;
                 }
 
                 //Pass info into terrain plane

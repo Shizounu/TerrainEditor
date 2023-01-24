@@ -60,7 +60,7 @@ Material:
     m_Floats:
     - _BUILTIN_QueueControl: 0
     - _BUILTIN_QueueOffset: 0
-    - _Base_Height: 3
+    - _Base_Height: 6
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
@@ -68,7 +68,7 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _Max_Height: 4
+    - _Max_Height: 7
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
