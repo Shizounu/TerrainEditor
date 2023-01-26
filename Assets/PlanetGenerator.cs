@@ -11,6 +11,8 @@ public class PlanetGenerator : MonoBehaviour
     [Range(2, 255)] public int PlaneVertexResolution;
     public Material mat;
 
+    [Header("Physics Info")]
+    public PlanetChunkManager chunkManager;
     private static Vector3[] directions =
     {
             Vector3.up,
@@ -21,13 +23,14 @@ public class PlanetGenerator : MonoBehaviour
             Vector3.forward
     };
     TerrainPlane[,] terrainPlanes;
-    MeshFilter[,] terrainFilters;
+    public MeshFilter[,] terrainFilters;
 
     private void InitializeSides(){
         //Ensure lists are set properly
         if(terrainFilters == null || terrainFilters.Length != directions.Length * PlanesPerSideSqr)
             terrainFilters = new MeshFilter[directions.Length, PlanesPerSideSqr];
         terrainPlanes = new TerrainPlane[directions.Length, PlanesPerSideSqr];
+        chunkManager.allChunks = new();
 
         //Generate different faces
         GameObject newFace;
@@ -38,13 +41,20 @@ public class PlanetGenerator : MonoBehaviour
                     newFace = new GameObject($"TerrainFace_{sideIndex}|{planeIndex}");
                     newFace.transform.SetParent(this.transform);
 
-                    newFace.AddComponent<MeshRenderer>().material = mat;
+                    MeshRenderer renderer = newFace.AddComponent<MeshRenderer>();
+                    renderer.material = mat;
                     terrainFilters[sideIndex, planeIndex] = newFace.AddComponent<MeshFilter>();
 
                     Mesh newMesh = new();
                     newMesh.name = $"TerrainFace_{sideIndex}|{planeIndex}";
                     terrainFilters[sideIndex, planeIndex].sharedMesh = newMesh;
-                    newFace.AddComponent<MeshCollider>().sharedMesh = newMesh;
+                    
+                    MeshCollider collider = newFace.AddComponent<MeshCollider>();
+                    collider.sharedMesh = newMesh;
+                    
+                    newFace.layer = 6;
+                    chunkManager.allChunks.Add(new PlanetChunkManager.Chunk(collider, renderer));
+                    
                 }
 
                 //Pass info into terrain plane

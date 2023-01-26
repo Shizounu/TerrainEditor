@@ -35,7 +35,7 @@ MonoBehaviour:
       LayerCount: 2
       Frequency: 1
       Persistence: 1
-      Amplitude: 2.41
+      Amplitude: 1.24
       Roughness: 2.88
       GroundLevel: 0
       NoiseCenter: {x: 0, y: 2, z: 0}
