@@ -1,0 +1,101 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+#include "Assets\Compute Generator\noiseSimplex.cginc"
+
+//base directions
+float3 VertexCompute_localUp;
+float3 VertexCompute_axisRight;
+float3 VertexCompute_axisUp;
+
+//Positional infos
+float VertexCompute_sideLength;
+float2 VertexCompute_offset;
+
+//Layout infos
+uint VertexCompute_Resolution;
+uint VertexCompute_facesPerSide;
+
+RWStructuredBuffer<float3> VertexCompute_Positions; //resulting verticies
+struct NoiseSettings
+{
+    int NoiseSeed;
+    float Strength;
+    int LayerCount;
+
+    float Frequency;
+    float Persistence;
+    float Amplitude;
+    float Roughness;
+    float GroundLevel;
+    
+    float3 NoiseCenter;
+};
+RWStructuredBuffer<NoiseSettings> VertexCompute_NoiseSettings;
+uint VertexCompute_NoiseSettingsLength;
+void setPosition(uint3 _id, float3 _position){
+    if(_id.x < VertexCompute_Resolution && _id.y < VertexCompute_Resolution){
+        VertexCompute_Positions[_id.x + _id.y * VertexCompute_Resolution] = _position; 
+    }
+}
+
+float3 Normalize(float3 val){
+    float magnitude = sqrt(val.x * val.x + val.y * val.y + val.z * val.z);
+    return val / magnitude;
+}
+
+float3 planePosToSpherePos(float3 planePos){
+    float3 localPlanePos = planePos / VertexCompute_sideLength;
+
+    float x2 = localPlanePos.x * localPlanePos.x;
+    float y2 = localPlanePos.y * localPlanePos.y;
+    float z2 = localPlanePos.z * localPlanePos.z;
+
+    float xPrime = localPlanePos.x * sqrt(1 - (y2 + z2) / 2 + (y2 * z2) / 3);
+    float yPrime = localPlanePos.y * sqrt(1 - (x2 + z2) / 2 + (x2 * z2) / 3);
+    float zPrime = localPlanePos.z * sqrt(1 - (x2 + y2) / 2 + (x2 * y2) / 3);
+
+    return Normalize(float3(xPrime, yPrime, zPrime)) * VertexCompute_sideLength;
+}
+
+float evaluate(float3 _point, NoiseSettings settings){
+    float noiseVal = 0.0;
+    float frequency = settings.Frequency;
+    float amplitude = settings.Amplitude;
+
+    for(int i = 0; i < settings.LayerCount; i++){
+        float v = snoise(settings.NoiseCenter + _point * frequency);
+        noiseVal += (v+1.0)*0.5*amplitude;
+
+        frequency *= settings.Roughness;
+        amplitude *= settings.Persistence;
+    } 
+
+    if(noiseVal < settings.GroundLevel)
+        return settings.GroundLevel * settings.Strength;
+    return noiseVal * settings.Strength;
+} //calculates the actual noise position
+
+float3 calculatePointOnPlanet(float3 spherePos){
+    float3 planetPos = spherePos;
+    float elevation = 1.0;
+
+    for(int i = 0; i < VertexCompute_NoiseSettingsLength; i++)
+        elevation *= evaluate(planetPos, VertexCompute_NoiseSettings[i]);
+    return planetPos * (1.0 + elevation);
+}
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    float2 percent = float2(id.x / (VertexCompute_Resolution - 1.0) - 0.5, id.y / (VertexCompute_Resolution - 1.0) - 0.5);
+    float3 basePos = VertexCompute_localUp * VertexCompute_sideLength / 2 + 
+        VertexCompute_axisRight * VertexCompute_offset.x + 
+        VertexCompute_axisUp * VertexCompute_offset.y; //starting position of the mesh
+    float3 baseVertexPosition = basePos + 
+        ((VertexCompute_axisRight * percent.x) + (VertexCompute_axisUp * percent.y)) * 
+        VertexCompute_sideLength / VertexCompute_facesPerSide;//calculate the position of the vertex to put on the cube mesh
+    float3 spherePos = planePosToSpherePos(baseVertexPosition); //transform cube to sphere
+    float3 planetPos = calculatePointOnPlanet(spherePos);
+
+    setPosition(id, planetPos);
+}

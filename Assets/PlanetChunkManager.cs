@@ -34,7 +34,8 @@ public class PlanetChunkManager : MonoBehaviour
         
         
         //determien chunks in range
-        List<Collider> hits = Physics.OverlapSphere(viewTransform.position, viewRadius, chunkLayer).ToList();
+        List<Collider> hits = Physics.OverlapSphere(viewTransform.position, viewRadius, chunkLayer).ToList(); //change to non alloc
+        
 
         foreach (Collider c in hits){
             foreach (Chunk chunk in allChunks){
