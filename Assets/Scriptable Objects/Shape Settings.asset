@@ -31,11 +31,11 @@ MonoBehaviour:
     UseFirstLayerAsMask: 0
     NoiseSettings:
       NoiseSeed: 0
-      Strength: 1
+      Strength: 0.3
       LayerCount: 2
-      Frequency: 1
-      Persistence: 1
-      Amplitude: 1.24
-      Roughness: 2.88
+      Frequency: 0.42
+      Persistence: 0.11
+      Amplitude: 0.6
+      Roughness: 0.68
       GroundLevel: 0
       NoiseCenter: {x: 0, y: 2, z: 0}
