@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 public class ObjectPlacer : MonoBehaviour
 {
+    [SerializeField] private PlanetChunkManager chunkManager;
     [SerializeField] private PlanetGenerator generator;
     [SerializeField] private GameObject landPrefab;
     [SerializeField] private GameObject waterPrefab;
@@ -26,10 +27,14 @@ public class ObjectPlacer : MonoBehaviour
             GameObject go =  GameObject.Instantiate(waterPrefab, position, Quaternion.identity);
             go.transform.parent = this.transform;
             go.transform.up = up;
+
+            chunkManager.allChunks.Add(new PlanetChunkManager.Chunk(go.GetComponent<Collider>(), go.GetComponent<MeshRenderer>()));
         } else if (Vector3.Distance(position, generator.transform.position) >= generator.shapeGenerator.PlanetRadius + errorMargin) {
             GameObject go =  GameObject.Instantiate(landPrefab, position, Quaternion.identity);
             go.transform.parent = this.transform;
             go.transform.up = up;
+
+            chunkManager.allChunks.Add(new PlanetChunkManager.Chunk(go.GetComponent<Collider>(), go.GetComponent<MeshRenderer>()));
         } else {
             Debug.LogError("Not a valid placement");
         }

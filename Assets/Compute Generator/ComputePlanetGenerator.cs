@@ -11,6 +11,7 @@ public class ComputePlanetGenerator : MonoBehaviour
     [Range(2, 255)] public int PlaneVertexResolution;
 
     [Header("References")]
+    [SerializeField] PlanetChunkManager chunkManager;
     [SerializeField] Material mat;
     [SerializeField] ComputeShader faceGenerator;
     ComputeFaceGenerator[,] terrainPlanes;
@@ -50,6 +51,8 @@ public class ComputePlanetGenerator : MonoBehaviour
                     
                     MeshCollider collider = newFace.AddComponent<MeshCollider>();
                     collider.sharedMesh = newMesh;
+
+                    chunkManager.allChunks.Add(new PlanetChunkManager.Chunk(collider, renderer));
                 }
 
                 terrainPlanes[sideIndex, planeIndex] = new ComputeFaceGenerator(

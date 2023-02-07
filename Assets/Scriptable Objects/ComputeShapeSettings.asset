@@ -12,6 +12,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82177e7f1f7f4fa4396f33d7546a529b, type: 3}
   m_Name: ComputeShapeSettings
   m_EditorClassIdentifier: 
-  PlanetRadius: 0
+  PlanetRadius: 6
   UseFancySphere: 0
-  NoiseLayers: []
+  NoiseLayers:
+  - Enabled: 0
+    UseFirstLayerAsMask: 0
+    NoiseSettings:
+      NoiseSeed: 0
+      Strength: 0
+      LayerCount: 1
+      Frequency: 0.4
+      Persistence: 0.42
+      Amplitude: 0.39
+      Roughness: 0.09
+      GroundLevel: 0
+      NoiseCenter: {x: 0, y: 0, z: 0}
+  - Enabled: 0
+    UseFirstLayerAsMask: 0
+    NoiseSettings:
+      NoiseSeed: 29
+      Strength: 1.35
+      LayerCount: 2
+      Frequency: 0.52
+      Persistence: 0.49
+      Amplitude: 0.46
+      Roughness: 0.15
+      GroundLevel: 0.31
+      NoiseCenter: {x: 0, y: 0, z: 0}
